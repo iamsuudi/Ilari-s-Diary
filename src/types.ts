@@ -11,3 +11,5 @@ export interface DiaryType {
 }
 
 export type NonSensitiveDiaryEntry = Omit<DiaryType, "comment">;
+
+export type DiaryEntry = Omit<DiaryType, "id">;

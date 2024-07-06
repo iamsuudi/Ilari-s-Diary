@@ -1,6 +1,12 @@
 import { Request, Response } from "express";
 import diaryData from "../data/diaryEntries.json";
-import { DiaryType, NonSensitiveDiaryEntry } from "../types";
+import {
+	DiaryEntry,
+	DiaryType,
+	NonSensitiveDiaryEntry,
+	visibility,
+	weather,
+} from "../types";
 
 const diaries: DiaryType[] = <DiaryType[]>diaryData;
 
@@ -9,7 +15,7 @@ export const getAllDiaries = async (_req: Request, res: Response) => {
 		({ comment, ...safe }) => safe
 	);
 
-	return res.json(filteredDiaires);
+	return res.status(200).json(filteredDiaires);
 };
 
 export const getById = async (
@@ -26,5 +32,27 @@ export const getById = async (
 		(diary) => diary.id === Number(id)
 	);
 
-	return res.json(diary ?? {});
+	return res.status(200).json(diary ?? {});
+};
+
+export const createDiary = async (
+	req: Request<
+		{},
+		{},
+		{
+			date: string;
+			weather: weather;
+			visibility: visibility;
+			comment: string;
+		}
+	>,
+	res: Response
+) => {
+	const entry: DiaryEntry = req.body;
+
+	const newDiary: DiaryType = { ...entry, id: diaries.length + 1 };
+
+	diaries.push(newDiary);
+
+	return res.status(201).json(newDiary);
 };
