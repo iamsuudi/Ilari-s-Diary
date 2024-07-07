@@ -7,6 +7,7 @@ import {
 	visibility,
 	weather,
 } from "../types";
+import toNewDiaryEntry from "../utility/toNewDiaryEntry";
 
 const diaries: DiaryType[] = <DiaryType[]>diaryData;
 
@@ -48,11 +49,15 @@ export const createDiary = async (
 	>,
 	res: Response
 ) => {
-	const entry: DiaryEntry = req.body;
+	try {
+		const entry: DiaryEntry = toNewDiaryEntry(req.body);
 
-	const newDiary: DiaryType = { ...entry, id: diaries.length + 1 };
+		const newDiary: DiaryType = { ...entry, id: diaries.length + 1 };
 
-	diaries.push(newDiary);
+		diaries.push(newDiary);
 
-	return res.status(201).json(newDiary);
+		return res.status(201).json(newDiary);
+	} catch (error: any) {
+		return res.status(400).json({ message: error.message });
+	}
 };
