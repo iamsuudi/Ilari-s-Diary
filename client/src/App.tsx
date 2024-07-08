@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { DiaryType } from "./types";
-import { getDiaries } from "./service";
+import { SyntheticEvent, useEffect, useState } from "react";
+import { DiaryEntry, DiaryType } from "./types";
+import { createDiary, getDiaries } from "./service";
+import { AxiosError } from "axios";
 
 function App() {
 	const [diaries, setDiaries] = useState<DiaryType[]>([]);
@@ -10,16 +11,34 @@ function App() {
 			.then((data) => {
 				setDiaries(data);
 			})
-			.catch((error) => {
+			.catch((error: AxiosError) => {
 				console.log(error.message);
 			});
 	}, []);
+
+	const handleSubmit = async (e: SyntheticEvent) => {
+		e.preventDefault();
+		try {
+			const formData = new FormData(e.target as HTMLFormElement);
+			const object = Object.fromEntries(formData) as DiaryEntry;
+			const result = await createDiary(object);
+			setDiaries(diaries.concat(result));
+		} catch (e) {
+			const error = e as AxiosError;
+			console.log(error.message);
+		}
+	};
 
 	return (
 		<div className="flex flex-col p-10">
 			<div className="flex flex-col">
 				<p className="font-bold text-xl">Add new diary</p>
-				<form action="" className="flex flex-col gap-5">
+
+				<form
+					action=""
+					method="post"
+					onSubmit={handleSubmit}
+					className="flex flex-col gap-5">
 					<label className="flex gap-5 items-center">
 						Date:
 						<input
@@ -33,7 +52,7 @@ function App() {
 						<select
 							name="visibility"
 							className="p-1 bg-black/20 rounded outline-none">
-							<option value="greate">greate</option>
+							<option value="great">great</option>
 							<option value="good">good</option>
 							<option value="ok">ok</option>
 							<option value="bad">bad</option>
@@ -60,6 +79,11 @@ function App() {
 							className="p-1 bg-black/20 rounded outline-none"
 						/>
 					</label>
+					<input
+						type="submit"
+						value={"Submit"}
+						className="bg-blue-500 py-1 px-5 rounded w-fit"
+					/>
 				</form>
 			</div>
 

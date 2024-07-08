@@ -49,15 +49,23 @@ export const createDiary = async (
 	>,
 	res: Response
 ) => {
+	console.log("create diary pinged");
+
 	try {
 		const entry: DiaryEntry = toNewDiaryEntry(req.body);
 
+		console.log({ entry });
+
 		const newDiary: DiaryType = { ...entry, id: diaries.length + 1 };
+
+		console.log({ newDiary });
 
 		diaries.push(newDiary);
 
 		return res.status(201).json(newDiary);
 	} catch (error: any) {
+		console.log(error.message);
+
 		return res.status(400).json({ message: error.message });
 	}
 };
